@@ -33,7 +33,17 @@ namespace Visualization
             DrawBoard();
         }
 
-        // Generates a tic-tac-toe board based on the settings
+        // Update it called once per frame
+        void Update()
+        {
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                Debug.Log(PositionToSquare(Input.mousePosition));
+            }
+        }
+
+        // DrawBoard generates a tic-tac-toe board based on the settings
         private void DrawBoard()
         {
             // Generate vertical lines
@@ -78,7 +88,7 @@ namespace Visualization
         }
 
         /// <summary>
-        /// Converts given position to clicked square, returns -1 if the clicked position is not on this tic-tac-toe board
+        /// Converts given position to clicked square, returns (-1, -1) if the clicked position is outside the bounds of this tic-tac-toe board
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
@@ -133,15 +143,6 @@ namespace Visualization
             position = new Vector2(position.x < settings.dimensions ? position.x : -1, position.y < settings.dimensions ? position.y : -1);
             // Returns square position
             return position.x < 0 | position.y < 0 ? new Vector2(-1, -1) : position;
-        }
-
-        void Update()
-        {
-
-            if (Input.GetMouseButtonUp(0))
-            {
-                Debug.Log(PositionToSquare(Input.mousePosition));
-            }
         }
 
         [System.Serializable]
