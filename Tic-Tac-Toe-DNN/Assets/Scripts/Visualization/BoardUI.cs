@@ -24,6 +24,7 @@ namespace TicTacToe.UI
             private float longLength;
             private float shortLength;
             private float centerOffser;
+            private Board board;
 
             // Start is called before the first frame update
             private void Start()
@@ -44,18 +45,24 @@ namespace TicTacToe.UI
                 InitiateSprites();
                 // Generates the board
                 DrawBoard();
+                // Create a new board representation
+                board = new Board(settings.dimensions, settings.dimensions, Board.GameMode.line);
             }
 
             // Update it called once per frame
             void Update()
             {
 
-                if (Input.GetMouseButtonUp(0))
+                if (Input.GetMouseButtonUp(0) && board.gameState == Board.GameState.onGoing)
                 {
                     SquarePos clickedSquare = PositionToSquare(Input.mousePosition);
                     if (clickedSquare.x != -1 && clickedSquare.y != -1)
                     {
-                        UpdateSprite(Type.x, clickedSquare);
+                        if (board.IsEmpty(clickedSquare))
+                        {
+                            UpdateSprite(board.sideToMove == Board.SideToMove.x ? Type.x : Type.o, clickedSquare);
+                            board.MakeMove(clickedSquare, false);
+                        }
                     }
                 }
             }

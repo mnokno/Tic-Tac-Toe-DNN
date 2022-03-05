@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace TicTacToe.Technical
 {
@@ -13,7 +14,6 @@ namespace TicTacToe.Technical
         public GameMode gameMode { private set; get; }
         private Field[,] fields;
         private Stack<SquarePos> history = new Stack<SquarePos>();
-        private static readonly SquarePos[] rayLines = new SquarePos[] { new SquarePos(1, 0), new SquarePos(0, 1), new SquarePos(1, -1), new SquarePos(1, 1) };
         private static readonly SquarePos[] rayDirections = new SquarePos[] { new SquarePos(1, 0), new SquarePos(-1, 0), new SquarePos(0, 1), new SquarePos(0, -1), new SquarePos(1, -1), new SquarePos(-1, 1), new SquarePos(1, 1), new SquarePos(-1, -1) };
         private int[][,] squaresToEdge = new int[8][,];
 
@@ -25,6 +25,7 @@ namespace TicTacToe.Technical
             gameState = GameState.onGoing;
             sideToMove = SideToMove.x;
             InitFields();
+            CalculateSquaresToEdge();
         }
 
         /// <summary>
@@ -47,9 +48,17 @@ namespace TicTacToe.Technical
         /// </summary>
         private void CalculateSquaresToEdge()
         {
+            // Calculates the table
             bool IsValid(SquarePos squarePos)
             {
-                return true;
+                if (squarePos.x < 0 || squarePos.y < 0 || squarePos.x > dimensions - 1 || squarePos.y > dimensions - 1)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
 
             for (int i = 0; i < 8; i++)
@@ -64,10 +73,11 @@ namespace TicTacToe.Technical
                     for (int i = 0; i < rayDirections.Length; i++)
                     {
                         int toEdge = 0;
-                        SquarePos currentPosition = new SquarePos(x, y);
+                        SquarePos currentPosition = new SquarePos(x, y) + rayDirections[i];
                         while (IsValid(currentPosition))
                         {
                             toEdge++;
+                            currentPosition += rayDirections[i];
                         }
                         squaresToEdge[i][x, y] = toEdge;
                     }
@@ -96,6 +106,8 @@ namespace TicTacToe.Technical
 
                 UpdateGameState(move);
             }
+
+            Debug.Log(gameState);
         }
 
         /// <summary>
@@ -117,21 +129,55 @@ namespace TicTacToe.Technical
         /// </summary>
         private void UpdateGameState(SquarePos move)
         {
+            // Note, when this method is called we can assume that the game sate is onGoing
             if (gameMode == GameMode.line)
             {
-                foreach (SquarePos rayLine in rayLines)
+                Field checkFor = sideToMove == SideToMove.o ? Field.x : Field.o;
+                for (int i = 0; i < rayDirections.Length; i+=2)
                 {
-                    int count = 0;
-                    foreach (SquarePos rayDirection in new SquarePos[] { rayLine, -rayLine })
+                    int count = 1;
+                    for (int j = 0; j < 2; j++)
                     {
-                        SquarePos currentPosition = move;
+                        SquarePos currentPos = move;
+                        int rayIndex = i + j;
+                        for (int u = 0; u < squaresToEdge[rayIndex][move.x, move.y]; u++)
+                        {
+                            currentPos += rayDirections[rayIndex];
+                            if (fields[currentPos.x, currentPos.y] != checkFor)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                count++;
+                            }
+                        }
                     }
+
+                    if (count >= lineLenght)
+                    {
+                        gameState = sideToMove == SideToMove.o ? GameState.xWon : GameState.yWon;
+                        return;
+                    }
+                }
+
+                if (history.Count == dimensions * dimensions)
+                {
+                    gameState = GameState.draw;
                 }
             }
             else
             {
                 Debug.Log("In development, most lines game mode is not supported yet!");
             }
+        }
+
+        /// <summary>
+        /// Returns true if given square is empty
+        /// </summary>
+        public bool IsEmpty(SquarePos squarePos)
+        {
+            return fields[squarePos.x, squarePos.y] == Field.empty;
         }
 
         // Field types
