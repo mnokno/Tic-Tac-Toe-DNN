@@ -102,7 +102,7 @@ namespace NN
         }
 
         // Computing outputs
-        public double[] ComputeOutputs(double[] inputs)
+        public double[] ComputeOutputs(double[] inputs, bool softMax)
         {
             // SETUP FOR COMPUTING OUTPUTS 
 
@@ -172,7 +172,10 @@ namespace NN
             }
 
             // Applies softmax
-            oNodes = Softmax(oNodes);
+            if (softMax)
+            {
+                oNodes = Softmax(oNodes);
+            }
 
             // Returns final values of the nodes from the output layer
             return oNodes;
