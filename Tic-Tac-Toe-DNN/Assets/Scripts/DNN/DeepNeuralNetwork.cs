@@ -541,15 +541,39 @@ namespace NN
         }
 
         // Getters
-        public double[] getWeights()
+        public double[] GetWeights()
         {
             return this.cWeights;
         }
 
-        public double[] getBiases()
+        public double[] GetBiases()
         {
             return this.cBiases;
         }
-    }
 
+        public void Save(string name)
+        {
+            string path = Application.streamingAssetsPath + $"\\{name}.dnn";
+            System.IO.File.WriteAllText(path, String.Join('-', GetWeights()) + ':' + String.Join('-', GetWeights()));
+        }
+
+        public void Load(string name)
+        {
+            string path = Application.streamingAssetsPath + $"\\{name}.dnn";
+            string[] data = System.IO.File.ReadAllText(path).Split(':');
+            double[][] parts = new double[2][];
+            for (int i = 0; i < 2; i++)
+            {
+                string[] sNumbers = data[i].Split("");
+                parts[i] = new double[sNumbers.Length];
+                for (int j = 0; j < sNumbers.Length; j++)
+                {
+                    parts[i][j] = double.Parse(sNumbers[j]);
+                }
+            }
+
+            SetWeights(parts[0]);
+            SetBiases(parts[1]);
+        }
+    }
 }

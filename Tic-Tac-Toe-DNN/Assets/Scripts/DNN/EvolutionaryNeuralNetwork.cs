@@ -14,8 +14,8 @@ namespace NN
         public void Mutate(float mutationChance, float mutationStrength)
         {
             // Gets weights and biases
-            double[] weights = this.getWeights();
-            double[] biases = this.getBiases();
+            double[] weights = this.GetWeights();
+            double[] biases = this.GetBiases();
 
             // Debug section start
             //Debug.Log($"mutationChance = {mutationChance}, mutationStrength = {mutationStrength}"); 
