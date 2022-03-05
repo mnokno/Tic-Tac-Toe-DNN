@@ -193,7 +193,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.050980393, g: 0.6313726, b: 0.57254905, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -376,7 +376,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1956546740}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: 0, z: 0}
+  m_LocalPosition: {x: -3, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -399,7 +399,8 @@ MonoBehaviour:
     dimensions: 3
     symbolSize: 1
     lineWidth: 0.1
-    paddingLength: 0
   boardClolor: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 1}
   container: {fileID: 1956546742}
   squareSprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  oSprite: {fileID: 21300000, guid: ec2750ef9c76bc843b75dc75f366d2a5, type: 3}
+  xSprite: {fileID: 21300000, guid: c92185b7a889c8247a843493d2422b12, type: 3}

@@ -10,10 +10,14 @@ namespace Visualization
         public Color boardClolor;
         public Transform container;
         public Sprite squareSprite;
+        public Sprite oSprite;
+        public Sprite xSprite;
 
         private Camera cam;
         private float scale;
 
+        private Vector2[,] centers;
+        private SpriteRenderer[,] sprites;
         private float longLength;
         private float shortLength;
         private float centerOffser;
@@ -24,11 +28,17 @@ namespace Visualization
             // Finds camera
             cam = FindObjectOfType<Camera>();
             // Calculates scale
-            scale = (settings.symbolSize * settings.dimensions) + (settings.lineWidth + settings.paddingLength * 2) * (settings.dimensions - 1);
+            scale = (settings.symbolSize * settings.dimensions) + (settings.lineWidth) * (settings.dimensions - 1);
             // Calculates square lengths and offsets, used to converts from world coordinates to a square position
-            longLength = settings.symbolSize + settings.lineWidth + settings.paddingLength * 2;
-            shortLength = settings.symbolSize + settings.lineWidth / 2f + settings.paddingLength;
-            centerOffser = (settings.dimensions / 2f) * (settings.symbolSize) + ((settings.dimensions - 1) / 2f) * (settings.paddingLength * 2 + settings.lineWidth);
+            longLength = settings.symbolSize + settings.lineWidth;
+            shortLength = settings.symbolSize + settings.lineWidth / 2f;
+            centerOffser = (settings.dimensions / 2f) * (settings.symbolSize) + ((settings.dimensions - 1) / 2f) * (settings.lineWidth);
+            // Creates an empty 2D array, and calculates centers
+            centers = new Vector2[settings.dimensions, settings.dimensions];
+            CalculateCenters();
+            // Creates an empty 2D array, and creates empty sprites
+            sprites = new SpriteRenderer[settings.dimensions, settings.dimensions];
+            InitiateSprites();
             // Generates the board
             DrawBoard();
         }
@@ -39,11 +49,17 @@ namespace Visualization
 
             if (Input.GetMouseButtonUp(0))
             {
-                Debug.Log(PositionToSquare(Input.mousePosition));
+                Vector2 clickedSquare = PositionToSquare(Input.mousePosition);
+                if (clickedSquare.x != -1 && clickedSquare.y != -1)
+                {
+                    UpdateSprite(Type.X, (int)clickedSquare.x, (int)clickedSquare.y);
+                }
             }
         }
 
-        // DrawBoard generates a tic-tac-toe board based on the settings
+        /// <summary>
+        /// DrawBoard generates a tic-tac-toe board based on the settings
+        /// </summary>
         private void DrawBoard()
         {
             // Generate vertical lines
@@ -59,7 +75,7 @@ namespace Visualization
                 spriteRenderer.color = boardClolor;
 
                 // Set correct location
-                float xPos = -scale / 2f + (settings.symbolSize * (i + 1)) + (settings.paddingLength * (1 + 2 * i)) + (settings.lineWidth / 2f) + (settings.lineWidth * i);
+                float xPos = -scale / 2f + (settings.symbolSize * (i + 1)) + (settings.lineWidth / 2f) + (settings.lineWidth * i);
                 currentLine.transform.localPosition = new Vector3(xPos, 0, 0);
 
                 // Set correct scale
@@ -79,7 +95,7 @@ namespace Visualization
                 spriteRenderer.color = boardClolor;
 
                 // Set correct location
-                float yPos = -scale / 2f + (settings.symbolSize * (i + 1)) + (settings.paddingLength * (1 + 2 * i)) + (settings.lineWidth / 2f) + (settings.lineWidth * i);
+                float yPos = -scale / 2f + (settings.symbolSize * (i + 1)) + (settings.lineWidth / 2f) + (settings.lineWidth * i);
                 currentLine.transform.localPosition = new Vector3(0, yPos, 0);
 
                 // Set correct scale
@@ -90,8 +106,6 @@ namespace Visualization
         /// <summary>
         /// Converts given position to clicked square, returns (-1, -1) if the clicked position is outside the bounds of this tic-tac-toe board
         /// </summary>
-        /// <param name="position"></param>
-        /// <returns></returns>
         private Vector2 PositionToSquare(Vector2 position)
         {
             int FloorDiv(float a)
@@ -145,13 +159,86 @@ namespace Visualization
             return position.x < 0 | position.y < 0 ? new Vector2(-1, -1) : position;
         }
 
+        /// <summary>
+        /// Calculates centers of squares with current board settings
+        /// </summary>
+        private void CalculateCenters()
+        {
+            // Used to store primitive coordinates
+            float[,] primitive = new float[2, settings.dimensions];
+
+            // Calculates primitive coordinates
+            Vector3 topRight = this.transform.position - new Vector3(centerOffser, centerOffser, 0);
+            for (int i = 0; i < settings.dimensions; i++)
+            {
+                primitive[0, i] = topRight.x + settings.symbolSize * (0.5f + i) + (settings.lineWidth) * i;
+                primitive[1, settings.dimensions - 1 - i] = topRight.y + settings.symbolSize * (0.5f + i) + (settings.lineWidth) * i;
+            }
+
+            // Calculates centers using primitive
+            for (int x = 0; x < settings.dimensions; x++)
+            {
+                for (int y = 0; y < settings.dimensions; y++)
+                {
+                    centers[x, y] = new Vector2(primitive[0, x], primitive[1, y]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates an empty sprite for each square
+        /// </summary>
+        private void InitiateSprites()
+        {
+            for (int x = 0; x < settings.dimensions; x++)
+            {
+                for (int y = 0; y < settings.dimensions; y++)
+                {
+                    GameObject go = new GameObject($"x:{x}, y:{y}");
+                    go.transform.SetParent(container);
+                    go.transform.position = centers[x, y];
+                    go.transform.localScale = new Vector3(settings.symbolSize / 2f,settings.symbolSize / 2f, 1);
+                    SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+                    sr.color = new Color(1, 1, 1, 1);
+                    sprites[x, y] = sr;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates displayed sprites, with the given coordinates
+        /// </summary>
+        private void UpdateSprite(Type type, int x, int y)
+        {
+            switch (type)
+            {
+                case Type.X:
+                    sprites[x, y].sprite = xSprite;
+                    break;
+                case Type.O:
+                    sprites[x, y].sprite = oSprite;
+                    break;
+                default:
+                    sprites[x, y].sprite = null;
+                    break;
+            }
+        }
+
+        // Groups board settings
         [System.Serializable]
         public struct BoardSttings
         {
             public int dimensions;
             public float symbolSize;
             public float lineWidth;
-            public float paddingLength;
+        }
+
+        // Type of square occupation
+        public enum Type
+        {
+            X,
+            O,
+            Empty
         }
     }
 }
