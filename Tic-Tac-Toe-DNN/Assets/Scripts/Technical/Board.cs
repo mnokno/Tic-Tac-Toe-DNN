@@ -156,7 +156,7 @@ namespace TicTacToe.Technical
 
                     if (count >= lineLenght)
                     {
-                        gameState = sideToMove == SideToMove.o ? GameState.xWon : GameState.yWon;
+                        gameState = sideToMove == SideToMove.o ? GameState.xWon : GameState.oWon;
                         return;
                     }
                 }
@@ -192,7 +192,7 @@ namespace TicTacToe.Technical
         public enum GameState
         {
             xWon,
-            yWon,
+            oWon,
             draw,
             onGoing
         }
