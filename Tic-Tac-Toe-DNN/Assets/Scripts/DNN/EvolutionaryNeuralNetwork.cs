@@ -18,7 +18,7 @@ namespace NN
             double[] biases = this.getBiases();
 
             // Debug section start
-            //Debug.Log($"mutationChance = {mutationChance}, mutationStrength = {mutationStrength}");
+            //Debug.Log($"mutationChance = {mutationChance}, mutationStrength = {mutationStrength}"); 
             // Debug section end
 
             // Mutates weights
