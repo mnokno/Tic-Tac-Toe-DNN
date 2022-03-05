@@ -180,6 +180,26 @@ namespace TicTacToe.Technical
             return fields[squarePos.x, squarePos.y] == Field.empty;
         }
 
+        /// <summary>
+        /// Generates and returns an array of all legal moves
+        /// </summary>
+        public SquarePos[] GenerateLegalMoves()
+        {
+            List<SquarePos> legalMoves = new List<SquarePos>();
+            for (int x = 0; x < dimensions; x++)
+            {
+                for (int y = 0; y < dimensions; y++)
+                {
+                    if (fields[x, y] == Field.empty)
+                    {
+                        legalMoves.Add(new SquarePos(x, y));
+                    }
+                }
+            }
+
+            return legalMoves.ToArray();
+        }
+
         // Field types
         private enum Field
         {
