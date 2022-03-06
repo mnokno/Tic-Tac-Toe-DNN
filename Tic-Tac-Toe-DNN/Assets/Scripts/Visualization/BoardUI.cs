@@ -47,6 +47,10 @@ namespace TicTacToe.UI
                 DrawBoard();
                 // Create a new board representation
                 board = new Board(settings.dimensions, settings.dimensions, Board.GameMode.line);
+
+                // Test
+                NN.Training.TrainingCenter trainingCenter = new NN.Training.TrainingCenter();
+                trainingCenter.Test();
             }
 
             // Update it called once per frame

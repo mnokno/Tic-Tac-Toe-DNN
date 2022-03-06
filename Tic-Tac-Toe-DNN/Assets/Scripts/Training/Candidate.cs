@@ -21,5 +21,10 @@ namespace NN.Training
         public int wins;
         public int loses;
         public int draws;
+
+        public override string ToString()
+        {
+            return $"Wins: {wins}, Loses: {loses}, Draws: {draws}";
+        }
     }
 }

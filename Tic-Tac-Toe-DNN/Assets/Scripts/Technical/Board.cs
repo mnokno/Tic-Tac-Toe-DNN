@@ -106,8 +106,6 @@ namespace TicTacToe.Technical
 
                 UpdateGameState(move);
             }
-
-            Debug.Log(gameState);
         }
 
         /// <summary>

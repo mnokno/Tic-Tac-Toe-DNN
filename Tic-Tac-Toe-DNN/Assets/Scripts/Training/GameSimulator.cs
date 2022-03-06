@@ -10,16 +10,16 @@ namespace NN.Training
         /// <summary>
         /// Simulates a match consisting of two game, each played will get to play as x and o, scores will be automatically updated
         /// </summary>
-        public static void SimulateMatch(Candidate candidateA, Candidate candidateB)
+        public static void SimulateMatch(ref Candidate candidateA, ref Candidate candidateB)
         {
-            SimulateGame(candidateA, candidateB);
-            SimulateGame(candidateB, candidateA);
+            SimulateGame(ref candidateA, ref candidateB);
+            SimulateGame(ref candidateB, ref candidateA);
         }
 
         /// <summary>
         /// Simulates a game, candidateA will play as x and candidateB as o, scores will be automatically updated
         /// </summary>
-        public static void SimulateGame(Candidate candidateA, Candidate candidateB)
+        public static void SimulateGame(ref Candidate candidateA, ref Candidate candidateB)
         {
             // Creates a new game
             Board board = new Board(3, 3, Board.GameMode.line);
