@@ -200,12 +200,20 @@ namespace TicTacToe.Technical
             return legalMoves.ToArray();
         }
 
-        // Field types
-        private enum Field
+        /// <summary>
+        /// Returns the values stored in a given field
+        /// </summary>
+        public Field GetFieldType(int x, int y)
         {
-            x,
-            o,
-            empty
+            return fields[x, y];
+        }
+
+        // Field types
+        public enum Field
+        {
+            x = -1,
+            o = 1,
+            empty = 0
         }
 
         // Game states
@@ -220,8 +228,8 @@ namespace TicTacToe.Technical
         // Player to move
         public enum SideToMove
         {
-            x,
-            o
+            x = -1,
+            o = 1
         }
 
         // Game mode
