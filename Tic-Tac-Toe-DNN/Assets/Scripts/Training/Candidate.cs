@@ -6,12 +6,12 @@ namespace NN.Training
 {
     public struct Candidate
     {
-        public EvolutionaryNeuralNetwork brain;
+        public AI AI;
         public Score score;
 
         public Candidate(EvolutionaryNeuralNetwork brain)
         {
-            this.brain = brain;
+            this.AI = new AI(brain);
             score = new Score();
         }
     }
