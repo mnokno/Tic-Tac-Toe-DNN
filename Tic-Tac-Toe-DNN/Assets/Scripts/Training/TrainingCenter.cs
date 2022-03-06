@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace NN.Training
@@ -21,7 +22,7 @@ namespace NN.Training
         /// <summary>
         /// Runs training session on the parents array, returns an array of numRes best parents, 80% parent based nets, 20% random to avoid getting stack in local minimums
         /// </summary>
-        public static Candidate[] RunTrainingSession(Candidate[] parrents, int numCandidates, int numSubsets, int numRes)
+        public static Candidate[] RunTrainingSession(Candidate[] parrents, int numCandidates, int numSubsets, int mainsetSize, int numRes)
         {
             // Candidates an empty array for candidates
             Candidate[] candidates = new Candidate[numCandidates];
@@ -32,22 +33,68 @@ namespace NN.Training
             int random = numCandidates - (perParrent + perParrentReshuffle) * parrents.Length;
 
             // Returns the best candidates
-            return SelectBest(candidates, numSubsets, numRes);
+            return SelectBest(candidates, numSubsets, mainsetSize, numRes);
         }
 
         /// <summary>
         /// Runs training session on a new population, returns an array of numRes best parents
         /// </summary>
-        public static Candidate[] RunTrainingSession(int numCandidates, int numSubsets, int numRes, int numInput, int[] numHidden, int numOutput)
+        public static Candidate[] RunTrainingSession(int numCandidates, int numSubsets, int mainsetSize, int numRes, int numInput, int[] numHidden, int numOutput)
         {
-            return SelectBest(GetRandomCandidates(numCandidates, numInput, numHidden, numOutput), numSubsets, numRes);
+            return SelectBest(GetRandomCandidates(numCandidates, numInput, numHidden, numOutput), numSubsets, mainsetSize, numRes);
         }
 
         /// <summary>
         /// Selects best networks from the candidates array by simulating games
         /// </summary>
-        public static Candidate[] SelectBest(Candidate[] candidates, int numSubsets, int numRes)
+        public static Candidate[] SelectBest(Candidate[] candidates, int numSubsets, int mainsetSize, int numRes)
         {
+            // Shuffles the list of candidates
+            System.Random random = new System.Random();
+            candidates = candidates.OrderBy(x => random.Next()).ToArray();
+
+            // Calculates number of candidates per subset
+            int subsetSize = candidates.Length / numSubsets;
+            int[] subsetSizes = new int[numSubsets];
+            for (int i = 0; i < numSubsets - 1; i++)
+            {
+                subsetSizes[i] = subsetSize;
+            }
+            subsetSizes[numSubsets - 1] = candidates.Length - subsetSize * (numSubsets - 1);
+
+            // Creates the subsets
+            Candidate[][] subsets = new Candidate[numSubsets][];
+            int rolingTotal = 0;
+            for (int i = 0; i < numSubsets; i++)
+            {
+                subsets[i] = new Candidate[subsetSizes[i]];
+                System.Array.Copy(candidates, rolingTotal, subsets[i], 0, subsetSizes[i]);
+                rolingTotal += subsetSizes[i];
+            }
+
+            // Simulates the tournament for each subset
+            for (int i = 0; i < numSubsets; i++)
+            {
+                for (int x = 0; x < subsets[i].Length - 1; x++)
+                {
+                    for (int y = x + 1; y < subsets[i].Length; y++)
+                    {
+                        GameSimulator.SimulateMatch(ref subsets[i][x], ref subsets[i][y]);
+                    }
+                }
+            }
+
+            // Calculates how many candidates should move on to main set
+            int[] fromSubsetsToMainset = new int[numSubsets];
+            int subsetProgressionCount = mainsetSize / numSubsets;
+            for (int i = 0; i < numSubsets - 1; i++)
+            {
+                fromSubsetsToMainset[i] = subsetProgressionCount;
+            }
+            fromSubsetsToMainset[numSubsets - 1] = mainsetSize - subsetProgressionCount * (numSubsets - 1);
+
+            Debug.Log(string.Join(" ", fromSubsetsToMainset));
+            Debug.Log(subsets[1][23].score);
             return null;
         }
 

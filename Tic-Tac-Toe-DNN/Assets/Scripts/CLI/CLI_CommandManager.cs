@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NN.Training;
 using TicTacToe.UI.Visualization;
 
 namespace CLI
@@ -15,7 +16,7 @@ namespace CLI
             // Replaces all ' ' (spaces) with '-' (minus)
             while (command.Contains(' '))
             {
-                command = command.Replace('\n', '-');
+                command = command.Replace(' ', '-');
             }
 
             // Splits the command into parts
@@ -53,6 +54,10 @@ namespace CLI
                 {
                     CLI_UI.Log("Invalid Command", Color.red);
                 }
+            }
+            else if (parts[0].ToLower() == "test" || parts[0].ToLower() == "t")
+            {
+                TrainingCenter.SelectBest(TrainingCenter.GetRandomCandidates(int.Parse(parts[1]), 10, new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 }, 1), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4]));
             }
             else
             {
