@@ -27,7 +27,7 @@ namespace TicTacToe.UI
             private Board board;
 
             // Start is called before the first frame update
-            private void Start()
+            public void Start()
             {
                 // Finds camera
                 cam = FindObjectOfType<Camera>();
