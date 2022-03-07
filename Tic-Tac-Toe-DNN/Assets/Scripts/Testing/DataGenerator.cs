@@ -40,9 +40,9 @@ namespace TicTacToe.Tests
             System.Random random = new System.Random();
             for (int i = 0; i < numElements; i++)
             {
-                candidates[i].score.wins = random.Next(-1000, 1000);
-                candidates[i].score.loses = random.Next(-1000, 1000);
-                candidates[i].score.draws = random.Next(-1000, 1000);
+                candidates[i].score.wins = random.Next(0, 25);
+                candidates[i].score.loses = random.Next(0, 25);
+                candidates[i].score.draws = random.Next(0, 25);
             }
 
             // Return the list;

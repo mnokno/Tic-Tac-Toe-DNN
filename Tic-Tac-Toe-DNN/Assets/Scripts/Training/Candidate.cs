@@ -26,5 +26,43 @@ namespace NN.Training
         {
             return $"Wins: {wins}, Loses: {loses}, Draws: {draws}";
         }
+
+        public static bool operator >(Score scoreA, Score scoreB)
+        {
+            if (scoreA.wins == scoreB.wins)
+            {
+                if (scoreA.loses == scoreB.loses)
+                {
+                    return scoreA.draws > scoreB.draws;
+                }
+                else
+                {
+                    return scoreA.loses < scoreB.loses;
+                }
+            }
+            else
+            {
+                return scoreA.wins > scoreB.wins;
+            }
+        }
+
+        public static bool operator <(Score scoreA, Score scoreB)
+        {
+            if (scoreA.wins == scoreB.wins)
+            {
+                if (scoreA.loses == scoreB.loses)
+                {
+                    return scoreA.draws < scoreB.draws;
+                }
+                else
+                {
+                    return scoreA.loses > scoreB.loses;
+                }
+            }
+            else
+            {
+                return scoreA.wins < scoreB.wins;
+            }
+        }
     }
 }
