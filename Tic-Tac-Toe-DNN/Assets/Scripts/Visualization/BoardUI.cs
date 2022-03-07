@@ -51,6 +51,8 @@ namespace TicTacToe.UI
                 // Test
                 // NN.Training.TrainingCenter trainingCenter = new NN.Training.TrainingCenter();
                 // trainingCenter.Test();
+                Tests.Test.Run(1);
+                //Tests.MergeSort.TimeSort(20, sortCandidates: true, logSorted: true);
             }
 
             // Update it called once per frame
