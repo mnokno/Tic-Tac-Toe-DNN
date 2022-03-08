@@ -8,7 +8,7 @@ namespace TicTacToe.Tests
         /// <summary>
         /// Times how long it takes to perform a quick sort, return the time taken in ticks
         /// </summary>
-        public static float TimeSort(int numElements, bool sortCandidates = false, bool logSorted = false)
+        public static long TimeSort(int numElements, bool sortCandidates = false, bool logSorted = false)
         {
             // Creates the stopwatch
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
@@ -60,10 +60,41 @@ namespace TicTacToe.Tests
         /// </summary>
         private static void Sort(ref int[] elements)
         {
-            void QuickSort(ref int[] elements, int beg, int end)
+            void QuickSort(ref int[] toSort, int beg, int end)
             {
+                if (beg < end)
+                {
+                    // Orders the partition and return the index of the pivot point after ordering 
+                    int pivotIndex = Partition(ref toSort, beg, end);
 
+                    // Sorts the partition to the left and right of the pivot index
+                    QuickSort(ref toSort, beg, pivotIndex - 1);
+                    QuickSort(ref toSort, pivotIndex + 1, end);
+                }
             }
+
+            int Partition(ref int[] toSort, int beg, int end)
+            {
+                // Gets the pivot element (most right element)
+                int pivot = toSort[end];
+
+                // Orders the partition
+                int pivotIndex = beg;
+                for (int j = beg; j < end; j++)
+                {
+                    if (toSort[j] > pivot)
+                    {
+                        (toSort[pivotIndex], toSort[j]) = (toSort[j], toSort[pivotIndex]);
+                        pivotIndex++;
+                    }
+                }
+                (toSort[pivotIndex], toSort[end]) = (toSort[end], toSort[pivotIndex]);
+
+                // Return the pivot index
+                return pivotIndex;
+            }
+
+            QuickSort(ref elements, 0, elements.Length - 1);
         }
 
         /// <summary>

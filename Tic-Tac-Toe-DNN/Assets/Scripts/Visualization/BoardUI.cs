@@ -51,6 +51,7 @@ namespace TicTacToe.UI
                 // Test
                 //Tests.Test.Run(1);
                 //Tests.MergeSort.TimeSort(10000, sortCandidates: true, logSorted: true);
+                Tests.QuickSort.TimeSort(20, logSorted : true);
             }
 
             // Update it called once per frame
