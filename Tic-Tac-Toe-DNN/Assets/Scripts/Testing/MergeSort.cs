@@ -5,6 +5,9 @@ namespace TicTacToe.Tests
 {
     public static class MergeSort
     {
+        /// <summary>
+        /// Times how long it takes to perform a merge sort, return the time taken in ticks
+        /// </summary>
         public static long TimeSort(int numElements, bool sortCandidates = false, bool logSorted = false)
         {
             // Creates the stopwatch
@@ -52,6 +55,9 @@ namespace TicTacToe.Tests
             return stopwatch.ElapsedTicks;
         }
 
+        /// <summary>
+        /// Sorts the array of integers using merge sort
+        /// </summary>
         private static void Sort(ref int[] elements)
         {
             void Merge(ref int[] toSort, int begin, int mid, int end)
@@ -125,6 +131,9 @@ namespace TicTacToe.Tests
             MergeSort (ref elements, 0, elements.Length - 1);
         }
 
+        /// <summary>
+        /// Sorts the array of candidates using merge sort
+        /// </summary>
         private static void Sort(ref Candidate[] elements)
         {
             // Creates a local version of the elements list

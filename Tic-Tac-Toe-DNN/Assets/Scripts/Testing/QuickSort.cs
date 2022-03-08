@@ -5,6 +5,9 @@ namespace TicTacToe.Tests
 {
     public static class QuickSort
     {
+        /// <summary>
+        /// Times how long it takes to perform a quick sort, return the time taken in ticks
+        /// </summary>
         public static float TimeSort(int numElements, bool sortCandidates = false, bool logSorted = false)
         {
             // Creates the stopwatch
@@ -18,18 +21,18 @@ namespace TicTacToe.Tests
                 stopwatch.Start();
                 // Sorts the list
                 Sort(ref candidates);
+                // Stops the stopwatch
+                stopwatch.Stop();
                 // Optionally print the sorted list
                 if (logSorted)
                 {
                     string formated = "";
                     foreach (Candidate c in candidates)
                     {
-                        formated += c.score;
+                        formated += "\n" + c.score;
                     }
                     Debug.Log(formated);
                 }
-                // Stops the stopwatch
-                stopwatch.Stop();
             }
             else
             {
@@ -39,27 +42,33 @@ namespace TicTacToe.Tests
                 stopwatch.Start();
                 // Sorts the list
                 Sort(ref numbers);
+                // Stops the stopwatch
+                stopwatch.Stop();
                 // Optionally print the sorted list
                 if (logSorted)
                 {
                     Debug.Log(string.Join("\n", numbers));
                 }
-                // Stops the stopwatch
-                stopwatch.Stop();
             }
 
             // Returns the time taken to sort the list
-            return stopwatch.ElapsedMilliseconds;
+            return stopwatch.ElapsedTicks;
         }
 
-        private static float Sort(ref int[] elements)
+        /// <summary>
+        /// Sorts the array of integers using quick sort
+        /// </summary>
+        private static void Sort(ref int[] elements)
         {
-            return 0;
+
         }
 
-        private static float Sort(ref Candidate[] elements)
+        /// <summary>
+        /// Sorts the array of candidates using quick sort
+        /// </summary>
+        private static void Sort(ref Candidate[] elements)
         {
-            return 0;
+
         }
     }
 }
