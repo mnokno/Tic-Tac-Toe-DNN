@@ -102,7 +102,62 @@ namespace TicTacToe.Tests
         /// </summary>
         private static void Sort(ref Candidate[] elements)
         {
+            // Creates a local version of the elements list
+            Candidate[] lElements = elements;
 
+            void QuickSort(ref int[] toSort, int beg, int end)
+            {
+                if (beg < end)
+                {
+                    // Orders the partition and return the index of the pivot point after ordering 
+                    int pivotIndex = Partition(ref toSort, beg, end);
+
+                    // Sorts the partition to the left and right of the pivot index
+                    QuickSort(ref toSort, beg, pivotIndex - 1);
+                    QuickSort(ref toSort, pivotIndex + 1, end);
+                }
+            }
+
+            int Partition(ref int[] toSort, int beg, int end)
+            {
+                // Gets the pivot element (most right element)
+                int pivot = toSort[end];
+
+                // Orders the partition
+                int pivotIndex = beg;
+                for (int j = beg; j < end; j++)
+                {
+                    if (lElements[toSort[j]].score > lElements[pivot].score)
+                    {
+                        (toSort[pivotIndex], toSort[j]) = (toSort[j], toSort[pivotIndex]);
+                        pivotIndex++;
+                    }
+                }
+                (toSort[pivotIndex], toSort[end]) = (toSort[end], toSort[pivotIndex]);
+
+                // Return the pivot index
+                return pivotIndex;
+            }
+
+            // Optimization
+            int[] indexes = new int[elements.Length];
+            for (int i = 0; i < elements.Length; i++)
+            {
+                indexes[i] = i;
+            }
+
+            // Sorts the list by manipulating indexes of the elements (not the actual element)
+            QuickSort(ref indexes, 0, elements.Length - 1);
+
+            // Converts the sorted index list to a sorted list of candidates
+            Candidate[] sorted = new Candidate[elements.Length];
+            for (int i = 0; i < elements.Length; i++)
+            {
+                sorted[i] = elements[indexes[i]];
+            }
+
+            // Assignees sorted list to the reference list
+            elements = sorted;
         }
     }
 }

@@ -47,11 +47,6 @@ namespace TicTacToe.UI
                 DrawBoard();
                 // Create a new board representation
                 board = new Board(settings.dimensions, settings.dimensions, Board.GameMode.line);
-
-                // Test
-                //Tests.Test.Run(1);
-                //Tests.MergeSort.TimeSort(10000, sortCandidates: true, logSorted: true);
-                Tests.QuickSort.TimeSort(20, logSorted : true);
             }
 
             // Update it called once per frame
