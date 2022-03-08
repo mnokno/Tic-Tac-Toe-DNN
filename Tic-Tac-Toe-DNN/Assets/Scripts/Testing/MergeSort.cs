@@ -60,10 +60,10 @@ namespace TicTacToe.Tests
         /// </summary>
         private static void Sort(ref int[] elements)
         {
-            void Merge(ref int[] toSort, int begin, int mid, int end)
+            void Merge(ref int[] toSort, int beg, int mid, int end)
             {
                 // Extracts the arrays
-                int leftSize = mid - begin + 1;
+                int leftSize = mid - beg + 1;
                 int righSize = end - mid;
 
                 int[] leftArray = new int[leftSize];
@@ -71,7 +71,7 @@ namespace TicTacToe.Tests
 
                 for (int i = 0; i < leftSize; ++i)
                 {
-                    leftArray[i] = toSort[begin + i];
+                    leftArray[i] = toSort[beg + i];
                 }
                 for (int i = 0; i < righSize; ++i)
                 {
@@ -82,7 +82,7 @@ namespace TicTacToe.Tests
                 // Index counters
                 int leftIndex = 0;
                 int rightIndex = 0;
-                int mainIndex = begin;
+                int mainIndex = beg;
 
                 // Sorts the result data into the array
                 while (leftIndex < leftSize && rightIndex < righSize)
@@ -115,17 +115,17 @@ namespace TicTacToe.Tests
                 }
             }
 
-            void MergeSort(ref int[] toSort, int begin, int end)
+            void MergeSort(ref int[] toSort, int beg, int end)
             {
-                if (begin >= end)
+                if (beg >= end)
                 {
                     return;
                 }
 
-                int mid = begin + (end - begin) / 2;
-                MergeSort(ref toSort, begin, mid);
+                int mid = beg + (end - beg) / 2;
+                MergeSort(ref toSort, beg, mid);
                 MergeSort(ref toSort, mid + 1, end);
-                Merge(ref toSort, begin, mid, end);
+                Merge(ref toSort, beg, mid, end);
             }
 
             MergeSort (ref elements, 0, elements.Length - 1);
@@ -139,10 +139,10 @@ namespace TicTacToe.Tests
             // Creates a local version of the elements list
             Candidate[] lElements = elements;
 
-            void Merge(ref int[] toSort, int begin, int mid, int end)
+            void Merge(ref int[] toSort, int beg, int mid, int end)
             {
                 // Extracts the arrays
-                int leftSize = mid - begin + 1;
+                int leftSize = mid - beg + 1;
                 int righSize = end - mid;
 
                 int[] leftArray = new int[leftSize];
@@ -150,7 +150,7 @@ namespace TicTacToe.Tests
 
                 for (int i = 0; i < leftSize; ++i)
                 {
-                    leftArray[i] = toSort[begin + i];
+                    leftArray[i] = toSort[beg + i];
                 }
                 for (int i = 0; i < righSize; ++i)
                 {
@@ -161,7 +161,7 @@ namespace TicTacToe.Tests
                 // Index counters
                 int leftIndex = 0;
                 int rightIndex = 0;
-                int mainIndex = begin;
+                int mainIndex = beg;
 
                 // Sorts the result data into the array
                 while (leftIndex < leftSize && rightIndex < righSize)
@@ -194,17 +194,17 @@ namespace TicTacToe.Tests
                 }
             }
 
-            void MergeSort(ref int[] toSort, int begin, int end)
+            void MergeSort(ref int[] toSort, int beg, int end)
             {
-                if (begin >= end)
+                if (beg >= end)
                 {
                     return;
                 }
 
-                int mid = begin + (end - begin) / 2;
-                MergeSort(ref toSort, begin, mid);
+                int mid = beg + (end - beg) / 2;
+                MergeSort(ref toSort, beg, mid);
                 MergeSort(ref toSort, mid + 1, end);
-                Merge(ref toSort, begin, mid, end);
+                Merge(ref toSort, beg, mid, end);
             }
 
             // Optimization

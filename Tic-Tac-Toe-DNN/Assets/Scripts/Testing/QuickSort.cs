@@ -60,7 +60,10 @@ namespace TicTacToe.Tests
         /// </summary>
         private static void Sort(ref int[] elements)
         {
+            void QuickSort(ref int[] elements, int beg, int end)
+            {
 
+            }
         }
 
         /// <summary>
