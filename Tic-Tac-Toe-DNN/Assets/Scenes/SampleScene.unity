@@ -1039,8 +1039,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36720e3f386b8c14990a16a668c2951f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lightItem: {fileID: 6598022434923454821, guid: 959de27868edffb468bd4ca32b74553f, type: 3}
-  darkItme: {fileID: 6417301770832629091, guid: 34440b21bc5669b459ccddce3e7edb71, type: 3}
+  item: {fileID: 1070117055244251369, guid: e4a4c55aa6526ea489ad7b9c910c139e, type: 3}
   content: {fileID: 1728069263}
   inputField: {fileID: 790107304}
   scrollRect: {fileID: 1539806506}
@@ -1535,14 +1534,14 @@ MonoBehaviour:
   m_Padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Top: 2
+    m_Bottom: 2
   m_ChildAlignment: 4
   m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0

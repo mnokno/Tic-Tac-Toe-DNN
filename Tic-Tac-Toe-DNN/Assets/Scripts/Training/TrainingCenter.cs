@@ -7,6 +7,8 @@ namespace NN.Training
 {
     public class TrainingCenter
     {
+        public TaskProgress taskProgress = new TaskProgress();
+
         public void Test()
         {
             Candidate[] candidates = GetRandomCandidates(2, 10, new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 }, 1);
@@ -22,7 +24,7 @@ namespace NN.Training
         /// <summary>
         /// Runs training session on the parents array, returns an array of numRes best parents, 80% parent based nets, 20% random to avoid getting stack in local minimums
         /// </summary>
-        public static Candidate[] RunTrainingSession(Candidate[] parrents, int numCandidates, int numSubsets, int mainsetSize, int numRes)
+        public Candidate[] RunTrainingSession(Candidate[] parrents, int numCandidates, int numSubsets, int mainsetSize, int numRes)
         {
             // Candidates an empty array for candidates
             Candidate[] candidates = new Candidate[numCandidates];
@@ -39,7 +41,7 @@ namespace NN.Training
         /// <summary>
         /// Runs training session on a new population, returns an array of numRes best parents
         /// </summary>
-        public static Candidate[] RunTrainingSession(int numCandidates, int numSubsets, int mainsetSize, int numRes, int numInput, int[] numHidden, int numOutput)
+        public Candidate[] RunTrainingSession(int numCandidates, int numSubsets, int mainsetSize, int numRes, int numInput, int[] numHidden, int numOutput)
         {
             return SelectBest(GetRandomCandidates(numCandidates, numInput, numHidden, numOutput), numSubsets, mainsetSize, numRes);
         }
@@ -47,7 +49,7 @@ namespace NN.Training
         /// <summary>
         /// Selects best networks from the candidates array by simulating games
         /// </summary>
-        public static Candidate[] SelectBest(Candidate[] candidates, int numSubsets, int mainsetSize, int numRes)
+        public Candidate[] SelectBest(Candidate[] candidates, int numSubsets, int mainsetSize, int numRes)
         {
             // Shuffles the list of candidates
             System.Random random = new System.Random();
@@ -61,6 +63,13 @@ namespace NN.Training
                 subsetSizes[i] = subsetSize;
             }
             subsetSizes[numSubsets - 1] = candidates.Length - subsetSize * (numSubsets - 1);
+
+            // Calculates total number of matches to be player
+            foreach (int ss in subsetSizes)
+            {
+                taskProgress.totalGamesToSimulate += ss * (ss - 1) / 2;
+            }
+            taskProgress.startedTraining = true;
 
             // Creates the subsets
             Candidate[][] subsets = new Candidate[numSubsets][];
@@ -80,6 +89,7 @@ namespace NN.Training
                     for (int y = x + 1; y < subsets[i].Length; y++)
                     {
                         GameSimulator.SimulateMatch(ref subsets[i][x], ref subsets[i][y]);
+                        taskProgress.simulatedGames++;
                     }
                 }
             }
@@ -111,6 +121,16 @@ namespace NN.Training
             }
 
             return candidates;
+        }
+
+        /// <summary>
+        /// Used to show training progress
+        /// </summary>
+        public struct TaskProgress
+        {
+            public int totalGamesToSimulate;
+            public int simulatedGames;
+            public bool startedTraining;
         }
     }
 }

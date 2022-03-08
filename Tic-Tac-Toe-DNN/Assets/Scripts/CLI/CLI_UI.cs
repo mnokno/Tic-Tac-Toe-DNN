@@ -8,14 +8,13 @@ namespace CLI
     [RequireComponent(typeof(CLI_CommandManager))]
     public class CLI_UI : MonoBehaviour
     {
-        public GameObject lightItem;
-        public GameObject darkItme;
+        public GameObject item;
         public Transform content;
         public TMPro.TMP_InputField inputField;
         public ScrollRect scrollRect;
         public CLI_CommandManager CLI_CommandManager;
 
-        private bool nextDark = false;
+        private bool locked = false;
         private Stack<GameObject> gameObjects = new Stack<GameObject>();
 
         // Start is called before the first frame update
@@ -27,7 +26,7 @@ namespace CLI
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Tab))
+            if (!locked && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Tab)))
             {
                 if (inputField.text != "")
                 {
@@ -59,9 +58,8 @@ namespace CLI
         public void Log(string log, Color color)
         {
             // Logs the command to the CLI console
-            GameObject go = nextDark ? Instantiate(darkItme) : Instantiate(lightItem);
+            GameObject go = Instantiate(item);
             gameObjects.Push(go);
-            nextDark = !nextDark;
             go.transform.SetParent(content);
             go.transform.localScale = new Vector3(1, 1, 1);
             CLI_ScrolleViewItem scrolleViewItem = go.GetComponent<CLI_ScrolleViewItem>();
@@ -88,7 +86,6 @@ namespace CLI
         {
             if (gameObjects.Count != 0)
             {
-                nextDark = !nextDark;
                 Destroy(gameObjects.Pop().gameObject);
                 scrollRect.verticalNormalizedPosition = 0;
                 Canvas.ForceUpdateCanvases();
@@ -102,6 +99,14 @@ namespace CLI
         {
             gameObjects.Peek().GetComponent<CLI_ScrolleViewItem>().SetText(text);
             Canvas.ForceUpdateCanvases();
+        }
+
+        /// <summary>
+        /// Used to enable and disable the CLI's input field
+        /// </summary>
+        public void SetLocked(bool locked)
+        {
+            this.locked = locked;
         }
     }
 }
