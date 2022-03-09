@@ -10,11 +10,13 @@ namespace NN.Training
         // Used to expose training progress
         public TaskProgress taskProgress = new TaskProgress();
         // Stores best candidates fro previous training session
-        private Stack<Candidate[]> bestCandidates = new Stack<Candidate[]>();
+        public Stack<Candidate[]> bestCandidates = new Stack<Candidate[]>();
         // Network topology
         private int numInput = 10;
         private int[] numHidden = new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 };
         private int numOutput = 1;
+        // Flag used to decided what training should be run
+        public bool newNetwork = false;
 
         public void Test()
         {
@@ -275,6 +277,13 @@ namespace NN.Training
             public int totalGamesToSimulate;
             public int simulatedGames;
             public bool startedTraining;
+
+            public void Reset()
+            {
+                totalGamesToSimulate = 0;
+                simulatedGames = 0;
+                startedTraining = false;
+            }
         }
     }
 }
