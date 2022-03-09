@@ -38,7 +38,7 @@ namespace NN.Training
         {
             if (scoreA.loses == scoreB.loses)
             {
-                return scoreA.wins > scoreB.loses;
+                return scoreA.wins > scoreB.wins;
             }
             else
             {
@@ -50,7 +50,7 @@ namespace NN.Training
         {
             if (scoreA.loses == scoreB.loses)
             {
-                return scoreA.wins < scoreB.loses;
+                return scoreA.wins < scoreB.wins;
             }
             else
             {

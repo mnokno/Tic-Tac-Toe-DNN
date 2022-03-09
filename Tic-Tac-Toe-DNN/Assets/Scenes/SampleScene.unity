@@ -1958,7 +1958,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings:
-    dimensions: 4
+    dimensions: 3
     symbolSize: 1
     lineWidth: 0.1
   boardClolor: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 1}
