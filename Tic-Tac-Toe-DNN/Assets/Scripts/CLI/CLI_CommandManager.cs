@@ -38,7 +38,7 @@ namespace CLI
                 {
                     if (int.TryParse(parts[2], out int dimenstion))
                     {
-                        CLI_UI.Log($"Loading board: {dimenstion}x{dimenstion}");
+                        CLI_UI.Log($"Loading board: {dimenstion}x{dimenstion}", Color.green);
 
                         // Destroys old chess board
                         foreach (Transform child in board.container)

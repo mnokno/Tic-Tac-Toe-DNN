@@ -24,7 +24,7 @@ namespace NN.Training
         /// <summary>
         /// Runs training session on the parents array, returns an array of numRes best parents, 80% parent based nets, 20% random to avoid getting stack in local minimums
         /// </summary>
-        public Candidate[] RunTrainingSession(Candidate[] parrents, int numCandidates, int numSubsets, int mainsetSize, int numRes)
+        public void RunTrainingSession(Candidate[] parrents, int numCandidates, int numSubsets, int mainsetSize, int numRes)
         {
             // Candidates an empty array for candidates
             Candidate[] candidates = new Candidate[numCandidates];
@@ -35,21 +35,21 @@ namespace NN.Training
             int random = numCandidates - (perParrent + perParrentReshuffle) * parrents.Length;
 
             // Returns the best candidates
-            return SelectBest(candidates, numSubsets, mainsetSize, numRes);
+            SelectBest(candidates, numSubsets, mainsetSize, numRes);
         }
 
         /// <summary>
         /// Runs training session on a new population, returns an array of numRes best parents
         /// </summary>
-        public Candidate[] RunTrainingSession(int numCandidates, int numSubsets, int mainsetSize, int numRes, int numInput, int[] numHidden, int numOutput)
+        public void RunTrainingSession(int numCandidates, int numSubsets, int mainsetSize, int numRes, int numInput, int[] numHidden, int numOutput)
         {
-            return SelectBest(GetRandomCandidates(numCandidates, numInput, numHidden, numOutput), numSubsets, mainsetSize, numRes);
+            SelectBest(GetRandomCandidates(numCandidates, numInput, numHidden, numOutput), numSubsets, mainsetSize, numRes);
         }
 
         /// <summary>
         /// Selects best networks from the candidates array by simulating games
         /// </summary>
-        public Candidate[] SelectBest(Candidate[] candidates, int numSubsets, int mainsetSize, int numRes)
+        public void SelectBest(Candidate[] candidates, int numSubsets, int mainsetSize, int numRes)
         {
             // Shuffles the list of candidates
             System.Random random = new System.Random();
@@ -69,6 +69,7 @@ namespace NN.Training
             {
                 taskProgress.totalGamesToSimulate += ss * (ss - 1) / 2;
             }
+            taskProgress.totalGamesToSimulate += mainsetSize * (mainsetSize - 1) / 2;
             taskProgress.startedTraining = true;
 
             // Creates the subsets
@@ -103,9 +104,44 @@ namespace NN.Training
             }
             fromSubsetsToMainset[numSubsets - 1] = mainsetSize - subsetProgressionCount * (numSubsets - 1);
 
-            Debug.Log(string.Join(" ", fromSubsetsToMainset));
-            Debug.Log(subsets[1][23].score);
-            return null;
+            // Sorts each subset
+            for (int i = 0; i < subsets.Length; i++)
+            {
+                Sort(ref subsets[i]);
+            }
+
+            // Creates the main set
+            Candidate[] mainSet = new Candidate[mainsetSize];
+            int currentMainSetIndex = 0;
+            for (int i = 0; i < fromSubsetsToMainset.Length; i++)
+            {
+                for (int j = 0; j < fromSubsetsToMainset[i]; j++)
+                {
+                    mainSet[currentMainSetIndex] = subsets[i][j];
+                    mainSet[currentMainSetIndex].score.Reset();
+                    currentMainSetIndex++;
+                }
+            }
+
+            // Simulates games in main set
+            for (int x = 0; x < mainSet.Length - 1; x++)
+            {
+                for (int y = x + 1; y < mainSet.Length; y++)
+                {
+                    GameSimulator.SimulateMatch(ref mainSet[x], ref mainSet[y]);
+                    taskProgress.simulatedGames++;
+                }
+            }
+
+            // Sorts main set
+            Sort(ref mainSet);
+
+            // Returns best candidates from the main set
+            Candidate[] topCandidates = new Candidate[numRes];
+            for (int i = 0; i < numRes; i++)
+            {
+                topCandidates[i] = mainSet[i];
+            }
         }
 
         /// <summary>
@@ -121,6 +157,69 @@ namespace NN.Training
             }
 
             return candidates;
+        }
+
+        /// <summary>
+        /// Sorts the array of candidates using quick sort
+        /// </summary>
+        private static void Sort(ref Candidate[] elements)
+        {
+            // Creates a local version of the elements list
+            Candidate[] lElements = elements;
+
+            void QuickSort(ref int[] toSort, int beg, int end)
+            {
+                if (beg < end)
+                {
+                    // Orders the partition and return the index of the pivot point after ordering 
+                    int pivotIndex = Partition(ref toSort, beg, end);
+
+                    // Sorts the partition to the left and right of the pivot index
+                    QuickSort(ref toSort, beg, pivotIndex - 1);
+                    QuickSort(ref toSort, pivotIndex + 1, end);
+                }
+            }
+
+            int Partition(ref int[] toSort, int beg, int end)
+            {
+                // Gets the pivot element (most right element)
+                int pivot = toSort[end];
+
+                // Orders the partition
+                int pivotIndex = beg;
+                for (int j = beg; j < end; j++)
+                {
+                    if (lElements[toSort[j]].score > lElements[pivot].score)
+                    {
+                        (toSort[pivotIndex], toSort[j]) = (toSort[j], toSort[pivotIndex]);
+                        pivotIndex++;
+                    }
+                }
+                (toSort[pivotIndex], toSort[end]) = (toSort[end], toSort[pivotIndex]);
+
+                // Return the pivot index
+                return pivotIndex;
+            }
+
+            // Optimization
+            int[] indexes = new int[elements.Length];
+            for (int i = 0; i < elements.Length; i++)
+            {
+                indexes[i] = i;
+            }
+
+            // Sorts the list by manipulating indexes of the elements (not the actual element)
+            QuickSort(ref indexes, 0, elements.Length - 1);
+
+            // Converts the sorted index list to a sorted list of candidates
+            Candidate[] sorted = new Candidate[elements.Length];
+            for (int i = 0; i < elements.Length; i++)
+            {
+                sorted[i] = elements[indexes[i]];
+            }
+
+            // Assignees sorted list to the reference list
+            elements = sorted;
         }
 
         /// <summary>

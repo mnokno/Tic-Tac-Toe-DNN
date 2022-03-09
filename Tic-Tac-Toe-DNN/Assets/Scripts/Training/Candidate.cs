@@ -22,6 +22,13 @@ namespace NN.Training
         public int loses;
         public int draws;
 
+        public void Reset()
+        {
+            wins = 0;
+            draws = 0;
+            loses = 0;
+        }
+
         public override string ToString()
         {
             return $"Wins: {wins}, Loses: {loses}, Draws: {draws}";
