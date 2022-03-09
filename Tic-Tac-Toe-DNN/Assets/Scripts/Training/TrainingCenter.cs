@@ -7,7 +7,14 @@ namespace NN.Training
 {
     public class TrainingCenter
     {
+        // Used to expose training progress
         public TaskProgress taskProgress = new TaskProgress();
+        // Stores best candidates fro previous training session
+        private Stack<Candidate[]> bestCandidates = new Stack<Candidate[]>();
+        // Network topology
+        private int numInput = 10;
+        private int[] numHidden = new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 };
+        private int numOutput = 1;
 
         public void Test()
         {
@@ -24,15 +31,42 @@ namespace NN.Training
         /// <summary>
         /// Runs training session on the parents array, returns an array of numRes best parents, 80% parent based nets, 20% random to avoid getting stack in local minimums
         /// </summary>
-        public void RunTrainingSession(Candidate[] parrents, int numCandidates, int numSubsets, int mainsetSize, int numRes)
+        public void RunTrainingSession(int numParrents, int numCandidates, int numSubsets, int mainsetSize, int numRes)
         {
             // Candidates an empty array for candidates
             Candidate[] candidates = new Candidate[numCandidates];
 
+            // Caps number of parents
+            numParrents = numParrents < bestCandidates.Peek().Length ? bestCandidates.Peek().Length : numParrents;
+
             // Calculates split for random and parent based children
-            int perParrent = Mathf.FloorToInt(numCandidates * 0.8f / parrents.Length);
-            int perParrentReshuffle = Mathf.FloorToInt(numCandidates * 0.1f / parrents.Length);
-            int random = numCandidates - (perParrent + perParrentReshuffle) * parrents.Length;
+            int perParrent = Mathf.FloorToInt(numCandidates * 0.8f / numParrents);
+            int perParrentReshuffle = Mathf.FloorToInt(numCandidates * 0.1f / numParrents);
+            int random = numCandidates - (perParrent + perParrentReshuffle) * numParrents;
+
+            // Generates the candidates
+            int nextCandidateIndex = 0;
+            Candidate[] parrent = bestCandidates.Peek();
+            foreach (Candidate c in parrent)
+            {
+                for (int i = 0; i < perParrent; i++)
+                {
+                    candidates[nextCandidateIndex] = new Candidate(EvolutionaryNeuralNetwork.Coppy(c.AI.brain));
+                    candidates[nextCandidateIndex].AI.brain.Mutate(0.05f, 0.2f);
+                    nextCandidateIndex++;
+                }
+                for (int i = 0; i < perParrentReshuffle; i++)
+                {
+                    candidates[nextCandidateIndex] = new Candidate(EvolutionaryNeuralNetwork.Coppy(c.AI.brain));
+                    candidates[nextCandidateIndex].AI.brain.Mutate(0.1f, 2f);
+                    nextCandidateIndex++;
+                }
+            }
+            for (int j = 0; j < random; j++)
+            {
+                candidates[nextCandidateIndex] = GetRandomCandidate(numInput, numHidden, numOutput);
+                nextCandidateIndex++;
+            }
 
             // Returns the best candidates
             SelectBest(candidates, numSubsets, mainsetSize, numRes);
@@ -41,7 +75,7 @@ namespace NN.Training
         /// <summary>
         /// Runs training session on a new population, returns an array of numRes best parents
         /// </summary>
-        public void RunTrainingSession(int numCandidates, int numSubsets, int mainsetSize, int numRes, int numInput, int[] numHidden, int numOutput)
+        public void RunTrainingSession(int numCandidates, int numSubsets, int mainsetSize, int numRes)
         {
             SelectBest(GetRandomCandidates(numCandidates, numInput, numHidden, numOutput), numSubsets, mainsetSize, numRes);
         }
@@ -142,6 +176,9 @@ namespace NN.Training
             {
                 topCandidates[i] = mainSet[i];
             }
+
+            // Adds top candidates to the results stack
+            bestCandidates.Push(topCandidates);
         }
 
         /// <summary>
@@ -153,10 +190,18 @@ namespace NN.Training
 
             for (int i = 0; i < numCandidates; i++)
             {
-                candidates[i] = new Candidate(new EvolutionaryNeuralNetwork(numInput, numHidden, numOutput));
+                candidates[i] = GetRandomCandidate(numInput, numHidden, numOutput);
             }
 
             return candidates;
+        }
+
+        /// <summary>
+        /// Generates a candidate with random brains CLI
+        /// </summary>
+        public static Candidate GetRandomCandidate(int numInput, int[] numHidden, int numOutput)
+        {
+            return new Candidate(new EvolutionaryNeuralNetwork(numInput, numHidden, numOutput));
         }
 
         /// <summary>
