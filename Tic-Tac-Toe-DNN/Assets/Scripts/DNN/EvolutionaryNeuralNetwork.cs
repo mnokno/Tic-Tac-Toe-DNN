@@ -6,6 +6,8 @@ namespace NN
 {
     public class EvolutionaryNeuralNetwork : DeepNeuralNetwork
     {
+        public static System.Random random = new System.Random();
+
         public EvolutionaryNeuralNetwork(int numInput, int[] numHidden, int numOutput) : base(numInput, numHidden, numOutput)
         {
 
@@ -21,24 +23,26 @@ namespace NN
             double[] biases = this.GetBiases();
 
             // Debug section start
-            //Debug.Log($"mutationChance = {mutationChance}, mutationStrength = {mutationStrength}"); 
+            // Debug.Log($"mutationChance = {mutationChance}, mutationStrength = {mutationStrength}"); 
             // Debug section end
 
             // Mutates weights
             for (int i = 0; i < weights.Length; i++)
             {
-                if (Random.value <= mutationChance)
+                if (random.NextDouble() <= mutationChance)
                 {
-                    weights[i] += Random.Range(-mutationStrength, mutationStrength);
+                    // Random.Range(-mutationStrength, mutationStrength);
+                    weights[i] += random.NextDouble() * (mutationStrength + mutationStrength) - mutationStrength;
                 }
             }
 
             // Mutates biases
             for (int i = 0; i < biases.Length; i++)
             {
-                if (Random.value <= mutationChance)
+                if (random.NextDouble() <= mutationChance)
                 {
-                    biases[i] += Random.Range(-mutationStrength, mutationStrength);
+                    // Random.Range(-mutationStrength, mutationStrength);
+                    biases[i] += random.NextDouble() * (mutationStrength + mutationStrength) - mutationStrength;
                 }
             }
 

@@ -53,9 +53,18 @@ namespace NN.Training
             {
                 for (int i = 0; i < perParrent; i++)
                 {
-                    candidates[nextCandidateIndex] = new Candidate(EvolutionaryNeuralNetwork.Coppy(c.AI.brain));
-                    candidates[nextCandidateIndex].AI.brain.Mutate(0.05f, 0.2f);
-                    nextCandidateIndex++;
+                    try
+                    {
+                        EvolutionaryNeuralNetwork evolutionaryNeuralNetwork = EvolutionaryNeuralNetwork.Coppy(c.AI.brain);
+                        evolutionaryNeuralNetwork.Mutate(0.05f, 0.2f);
+                        Candidate candidate = new Candidate(evolutionaryNeuralNetwork);
+                        candidates[nextCandidateIndex] = candidate;
+                        nextCandidateIndex++;
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.Log(e);
+                    }
                 }
                 for (int i = 0; i < perParrentReshuffle; i++)
                 {

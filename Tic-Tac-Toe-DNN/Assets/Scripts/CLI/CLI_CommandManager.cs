@@ -11,6 +11,7 @@ namespace CLI
     {
         public BoardUI board;
         public CLI_UI CLI_UI;
+        private TrainingCenter trainingCenter = new TrainingCenter();
 
         public void ExecuteCommand(string command)
         {
@@ -65,11 +66,46 @@ namespace CLI
                     CLI_UI.SetLocked(false);
                 }
             }
-            else if (parts[0].ToLower() == "test" || parts[0].ToLower() == "t")
+            else if (parts[0].ToLower() == "train" || parts[0].ToLower() == "t")
             {
-                TrainingCenter trainingCenter = new TrainingCenter();
-                Task.Run(() => trainingCenter.SelectBest(TrainingCenter.GetRandomCandidates(int.Parse(parts[1]), 10, new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 }, 1), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4])));
-                StartCoroutine(UpdateProgress(trainingCenter));
+                if (parts.Length == 5)
+                {
+                    try
+                    {
+                        trainingCenter.taskProgress.Reset();
+                        Task.Run(() => trainingCenter.RunTrainingSession(int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4])));
+                        StartCoroutine(UpdateProgress(trainingCenter));
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.Log(e);
+                        CLI_UI.Log("Invalid Command", Color.red);
+                        CLI_UI.SetLocked(false);
+                    }
+                }
+                else if (parts.Length == 6)
+                {
+                    try
+                    {
+                        trainingCenter.taskProgress.Reset();
+                        Task.Run(() => trainingCenter.RunTrainingSession(int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4]), int.Parse(parts[5])));
+                        StartCoroutine(UpdateProgress(trainingCenter));
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.Log(e);
+                        CLI_UI.Log("Invalid Command", Color.red);
+                        CLI_UI.SetLocked(false);
+                    }
+                }
+                else
+                {
+                    CLI_UI.Log("Invalid Command", Color.red);
+                    CLI_UI.SetLocked(false);
+                }
+                //TrainingCenter trainingCenter = new TrainingCenter();
+                //Task.Run(() => trainingCenter.SelectBest(TrainingCenter.GetRandomCandidates(int.Parse(parts[1]), 10, new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 }, 1), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4])));
+                //StartCoroutine(UpdateProgress(trainingCenter));
             }
             else
             {
@@ -83,6 +119,7 @@ namespace CLI
         /// </summary>
         private IEnumerator UpdateProgress(TrainingCenter tc)
         {
+            // Shows progress
             CLI_UI.Log($"Training Progress: 0.0%", Color.green);
             while (!tc.taskProgress.startedTraining)
             {
@@ -94,6 +131,26 @@ namespace CLI
                 yield return new WaitForSecondsRealtime(0.1f);
             }
             CLI_UI.UpdateTextOnPreviousLog($"Training Progress: 100.0%");
+
+            // Shows top three networks
+            Candidate[] topCandidates = trainingCenter.bestCandidates.Peek();
+            string[] texts = new string[] { "T1: ", "T2: ", "T3: " };
+            string message = "";
+            if (topCandidates.Length < 3)
+            {
+                for (int i = 0; i < topCandidates.Length; i++)
+                {
+                    message += texts[i] + topCandidates[i].score + "\n";
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    message += texts[i] + topCandidates[i].score + "\n";
+                }
+            }
+            CLI_UI.Log(message.Trim(), Color.green);
             CLI_UI.SetLocked(false);
         }
     }
