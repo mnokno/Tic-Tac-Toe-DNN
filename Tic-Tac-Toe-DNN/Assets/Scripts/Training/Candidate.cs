@@ -36,39 +36,25 @@ namespace NN.Training
 
         public static bool operator >(Score scoreA, Score scoreB)
         {
-            if (scoreA.wins == scoreB.wins)
+            if (scoreA.loses == scoreB.loses)
             {
-                if (scoreA.loses == scoreB.loses)
-                {
-                    return scoreA.draws > scoreB.draws;
-                }
-                else
-                {
-                    return scoreA.loses < scoreB.loses;
-                }
+                return scoreA.wins > scoreB.loses;
             }
             else
             {
-                return scoreA.wins > scoreB.wins;
+                return scoreA.loses < scoreB.loses;
             }
         }
 
         public static bool operator <(Score scoreA, Score scoreB)
         {
-            if (scoreA.wins == scoreB.wins)
+            if (scoreA.loses == scoreB.loses)
             {
-                if (scoreA.loses == scoreB.loses)
-                {
-                    return scoreA.draws < scoreB.draws;
-                }
-                else
-                {
-                    return scoreA.loses > scoreB.loses;
-                }
+                return scoreA.wins < scoreB.loses;
             }
             else
             {
-                return scoreA.wins < scoreB.wins;
+                return scoreA.loses > scoreB.loses;
             }
         }
     }

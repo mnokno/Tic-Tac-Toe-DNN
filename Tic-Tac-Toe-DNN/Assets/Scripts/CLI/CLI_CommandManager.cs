@@ -107,6 +107,20 @@ namespace CLI
                 //Task.Run(() => trainingCenter.SelectBest(TrainingCenter.GetRandomCandidates(int.Parse(parts[1]), 10, new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 }, 1), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4])));
                 //StartCoroutine(UpdateProgress(trainingCenter));
             }
+            else if (parts[0].ToLower() == "save" || parts[0].ToLower() == "s")
+            {
+                if (parts.Length == 2)
+                {
+                    trainingCenter.bestCandidates.Peek()[0].AI.brain.Save(parts[1]);
+                    CLI_UI.Log("Saved successfully", Color.green);
+                    CLI_UI.SetLocked(false);
+                }
+                else
+                {
+                    CLI_UI.Log("Invalid Command", Color.red);
+                    CLI_UI.SetLocked(false);
+                }
+            }
             else
             {
                 CLI_UI.Log("Invalid Command", Color.red);
