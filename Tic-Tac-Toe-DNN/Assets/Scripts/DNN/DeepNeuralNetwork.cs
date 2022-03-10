@@ -557,7 +557,7 @@ namespace NN
         public void Save(string name)
         {
             string path = Application.streamingAssetsPath + $"\\{name}.dnn";
-            System.IO.File.WriteAllText(path, String.Join('-', GetWeights()) + ':' + String.Join('-', GetBiases()));
+            System.IO.File.WriteAllText(path, String.Join('<', GetWeights()) + ':' + String.Join('<', GetBiases()));
         }
 
         public void Load(string name)
@@ -567,7 +567,7 @@ namespace NN
             double[][] parts = new double[2][];
             for (int i = 0; i < 2; i++)
             {
-                string[] sNumbers = data[i].Split("-");
+                string[] sNumbers = data[i].Split("<");
                 parts[i] = new double[sNumbers.Length];
                 for (int j = 0; j < sNumbers.Length; j++)
                 {

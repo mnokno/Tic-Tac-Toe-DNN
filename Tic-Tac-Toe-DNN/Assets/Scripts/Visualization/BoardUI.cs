@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TicTacToe.Technical;
+using NN.Training;
+using NN;
 
 namespace TicTacToe.UI
 {
@@ -9,6 +11,9 @@ namespace TicTacToe.UI
     {
         public class BoardUI : MonoBehaviour
         {
+            public bool hvh;
+            public bool humanStarting;
+            public string AIName;
             public BoardSttings settings;
             public Color boardClolor;
             public Transform container;
@@ -25,6 +30,8 @@ namespace TicTacToe.UI
             private float shortLength;
             private float centerOffser;
             private Board board;
+            private bool acceptHumanInput;
+            private Candidate candidate;
 
             // Start is called before the first frame update
             public void Start()
@@ -47,6 +54,20 @@ namespace TicTacToe.UI
                 DrawBoard();
                 // Create a new board representation
                 board = new Board(settings.dimensions, settings.dimensions, Board.GameMode.line);
+                // Initializes AI
+                acceptHumanInput = hvh || humanStarting;
+                if (!hvh)
+                {
+                    candidate = new Candidate(new EvolutionaryNeuralNetwork(10, new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 }, 1));
+                    candidate.AI.brain.Load(AIName);
+                    
+                    if (!humanStarting)
+                    {
+                        MakeMove(candidate.AI.ChouseMove(board));
+                    }
+
+                    acceptHumanInput = true;
+                }
             }
 
             // Update it called once per frame
@@ -60,10 +81,25 @@ namespace TicTacToe.UI
                     {
                         if (board.IsEmpty(clickedSquare))
                         {
-                            UpdateSprite(board.sideToMove == Board.SideToMove.x ? Type.x : Type.o, clickedSquare);
-                            board.MakeMove(clickedSquare, false);
+                            MakeMove(clickedSquare);
+                            if (!hvh && board.gameState == Board.GameState.onGoing)
+                            {
+                                MakeMove(candidate.AI.ChouseMove(board));
+                            }
                         }
                     }
+                }
+            }
+
+            /// <summary>
+            /// Makes a move
+            /// </summary>
+            public void MakeMove(SquarePos move)
+            {
+                if (board.gameState == Board.GameState.onGoing)
+                {
+                    UpdateSprite(board.sideToMove == Board.SideToMove.x ? Type.x : Type.o, move);
+                    board.MakeMove(move, false);
                 }
             }
 
