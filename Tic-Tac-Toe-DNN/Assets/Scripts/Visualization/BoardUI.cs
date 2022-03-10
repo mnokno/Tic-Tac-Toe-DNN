@@ -58,7 +58,7 @@ namespace TicTacToe.UI
                 acceptHumanInput = hvh || humanStarting;
                 if (!hvh)
                 {
-                    candidate = new Candidate(new EvolutionaryNeuralNetwork(10, new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 }, 1));
+                    candidate = new Candidate(new EvolutionaryNeuralNetwork(9, new int[] { 36, 36 }, 9));
                     candidate.AI.brain.Load(AIName);
                     
                     if (!humanStarting)

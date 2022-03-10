@@ -15,6 +15,13 @@ namespace TicTacToe.Technical
             this.y = y;
         }
 
+        public static SquarePos IndexToSquarePos(int index, int boardSize)
+        {
+            int x = index % boardSize;
+            int y = (index - x) / boardSize;
+            return new SquarePos(x, y);
+        }
+
         public static SquarePos operator -(SquarePos move)
         {
             return new SquarePos(-move.x, -move.y);

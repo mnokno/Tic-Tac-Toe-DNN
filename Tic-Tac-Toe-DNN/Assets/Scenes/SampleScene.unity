@@ -1957,9 +1957,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af284fc24b69f4f4c83290270bfffbae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hvh: 0
+  hvh: 1
   humanStarting: 0
-  AIName: t17
+  AIName: t1
   settings:
     dimensions: 3
     symbolSize: 1

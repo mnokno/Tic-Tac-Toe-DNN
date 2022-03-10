@@ -68,12 +68,12 @@ namespace CLI
             }
             else if (parts[0].ToLower() == "train" || parts[0].ToLower() == "t")
             {
-                if (parts.Length == 5)
+                if (parts.Length == 3)
                 {
                     try
                     {
                         trainingCenter.taskProgress.Reset();
-                        Task.Run(() => trainingCenter.RunTrainingSession(int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4])));
+                        Task.Run(() => trainingCenter.RunTrainingSession(int.Parse(parts[1]), int.Parse(parts[2])));
                         StartCoroutine(UpdateProgress(trainingCenter));
                     }
                     catch (System.Exception e)
@@ -83,13 +83,28 @@ namespace CLI
                         CLI_UI.SetLocked(false);
                     }
                 }
-                else if (parts.Length == 6)
+                else if (parts.Length == 4)
                 {
                     try
                     {
                         trainingCenter.taskProgress.Reset();
-                        Task.Run(() => trainingCenter.RunTrainingSession(int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4]), int.Parse(parts[5])));
+                        Task.Run(() => trainingCenter.RunTrainingSession(int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3])));
                         StartCoroutine(UpdateProgress(trainingCenter));
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.Log(e);
+                        CLI_UI.Log("Invalid Command", Color.red);
+                        CLI_UI.SetLocked(false);
+                    }
+                }
+                else if (parts.Length == 5)
+                {
+                    try
+                    {
+                        trainingCenter.taskProgress.Reset();
+                        Task.Run(() => trainingCenter.RunTrainingSession(int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3])));
+                        StartCoroutine(UpdateProgress(trainingCenter, "t " + parts[1] + " " + parts[2] + " " + parts[3] + " " + (int.Parse(parts[4]) - 1).ToString()));
                     }
                     catch (System.Exception e)
                     {
@@ -164,8 +179,57 @@ namespace CLI
                     message += texts[i] + topCandidates[i].score + "\n";
                 }
             }
-            CLI_UI.Log(message.Trim(), Color.green);
+            CLI_UI.Log(message.Trim(), new Color(0, 0.75f, 0.75f, 1));
             CLI_UI.SetLocked(false);
+        }
+
+        /// <summary>
+        /// Updates progress of a training session
+        /// </summary>
+        private IEnumerator UpdateProgress(TrainingCenter tc, string command)
+        {
+            // Calculates iteration
+            int iteration = int.Parse(command.Split(" ")[4]) + 1;
+
+            // Shows progress
+            CLI_UI.Log($"RI: {iteration} Training Progress: 0.0%", Color.green);
+            while (!tc.taskProgress.startedTraining)
+            {
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
+            while (tc.taskProgress.totalGamesToSimulate > tc.taskProgress.simulatedGames)
+            {
+                CLI_UI.UpdateTextOnPreviousLog($"RI: {iteration} Training Progress: {((float)tc.taskProgress.simulatedGames * 100 / (float)tc.taskProgress.totalGamesToSimulate).ToString("0.0")}%");
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
+            CLI_UI.UpdateTextOnPreviousLog($"RI: {iteration} Training Progress: 100.0%");
+
+            // Shows top three networks
+            Candidate[] topCandidates = trainingCenter.bestCandidates.Peek();
+            string[] texts = new string[] { "T1: ", "T2: ", "T3: " };
+            string message = "";
+            if (topCandidates.Length < 3)
+            {
+                for (int i = 0; i < topCandidates.Length; i++)
+                {
+                    message += texts[i] + topCandidates[i].score + "\n";
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    message += texts[i] + topCandidates[i].score + "\n";
+                }
+            }
+            CLI_UI.Log(message.Trim(), new Color(0, 0.75f, 0.75f, 1));
+            CLI_UI.SetLocked(false);
+
+            // Executes the command
+            if (iteration - 1 > 0)
+            {
+                ExecuteCommand(command);
+            }
         }
     }
 }

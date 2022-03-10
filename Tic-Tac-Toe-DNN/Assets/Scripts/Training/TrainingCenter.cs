@@ -12,28 +12,19 @@ namespace NN.Training
         // Stores best candidates fro previous training session
         public Stack<Candidate[]> bestCandidates = new Stack<Candidate[]>();
         // Network topology
-        private int numInput = 10;
-        private int[] numHidden = new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 };
-        private int numOutput = 1;
+        //private int numInput = 9;
+        //private int[] numHidden = new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 };
+        //private int numOutput = 1;
+        private int numInput = 9;
+        private int[] numHidden = new int[] { 36, 36};
+        private int numOutput = 9;
         // Flag used to decided what training should be run
         public bool newNetwork = false;
-
-        public void Test()
-        {
-            Candidate[] candidates = GetRandomCandidates(2, 10, new int[] { 9, 9, 9, 8, 7, 6, 5, 4, 3, 2 }, 1);
-            GameSimulator.SimulateMatch(ref candidates[0], ref candidates[1]);
-            Debug.Log(candidates[0].score);
-            Debug.Log(candidates[1].score);
-            GameSimulator.SimulateMatch(ref candidates[0], ref candidates[1]);
-            GameSimulator.SimulateMatch(ref candidates[0], ref candidates[1]);
-            Debug.Log(candidates[0].score);
-            Debug.Log(candidates[1].score);
-        }
 
         /// <summary>
         /// Runs training session on the parents array, returns an array of numRes best parents, 80% parent based nets, 20% random to avoid getting stack in local minimums
         /// </summary>
-        public void RunTrainingSession(int numParrents, int numCandidates, int numSubsets, int mainsetSize, int numRes)
+        public void RunTrainingSession(int numParrents, int numCandidates, int numRes)
         {
             // Candidates an empty array for candidates
             Candidate[] candidates = new Candidate[numCandidates];
@@ -56,7 +47,7 @@ namespace NN.Training
                     try
                     {
                         EvolutionaryNeuralNetwork evolutionaryNeuralNetwork = EvolutionaryNeuralNetwork.Coppy(c.AI.brain);
-                        evolutionaryNeuralNetwork.Mutate(0.05f, 0.2f);
+                        evolutionaryNeuralNetwork.Mutate(0.001f, 0.2f);
                         Candidate candidate = new Candidate(evolutionaryNeuralNetwork);
                         candidates[nextCandidateIndex] = candidate;
                         nextCandidateIndex++;
@@ -69,7 +60,7 @@ namespace NN.Training
                 for (int i = 0; i < perParrentReshuffle; i++)
                 {
                     candidates[nextCandidateIndex] = new Candidate(EvolutionaryNeuralNetwork.Coppy(c.AI.brain));
-                    candidates[nextCandidateIndex].AI.brain.Mutate(0.1f, 2f);
+                    candidates[nextCandidateIndex].AI.brain.Mutate(0.01f, 1f);
                     nextCandidateIndex++;
                 }
             }
@@ -80,112 +71,44 @@ namespace NN.Training
             }
 
             // Returns the best candidates
-            SelectBest(candidates, numSubsets, mainsetSize, numRes);
+            SelectBest(candidates, numRes);
         }
 
         /// <summary>
         /// Runs training session on a new population, returns an array of numRes best parents
         /// </summary>
-        public void RunTrainingSession(int numCandidates, int numSubsets, int mainsetSize, int numRes)
+        public void RunTrainingSession(int numCandidates, int numRes)
         {
-            SelectBest(GetRandomCandidates(numCandidates, numInput, numHidden, numOutput), numSubsets, mainsetSize, numRes);
+            SelectBest(GetRandomCandidates(numCandidates, numInput, numHidden, numOutput), numRes);
         }
 
         /// <summary>
         /// Selects best networks from the candidates array by simulating games
         /// </summary>
-        public void SelectBest(Candidate[] candidates, int numSubsets, int mainsetSize, int numRes)
+        public void SelectBest(Candidate[] candidates, int numRes)
         {
-            // Shuffles the list of candidates
-            System.Random random = new System.Random();
-            candidates = candidates.OrderBy(x => random.Next()).ToArray();
-
-            // Calculates number of candidates per subset
-            int subsetSize = candidates.Length / numSubsets;
-            int[] subsetSizes = new int[numSubsets];
-            for (int i = 0; i < numSubsets - 1; i++)
-            {
-                subsetSizes[i] = subsetSize;
-            }
-            subsetSizes[numSubsets - 1] = candidates.Length - subsetSize * (numSubsets - 1);
-
             // Calculates total number of matches to be player
-            foreach (int ss in subsetSizes)
-            {
-                taskProgress.totalGamesToSimulate += ss * (ss - 1) / 2;
-            }
-            taskProgress.totalGamesToSimulate += mainsetSize * (mainsetSize - 1) / 2;
+            taskProgress.totalGamesToSimulate += candidates.Length * (candidates.Length - 1) / 2;
             taskProgress.startedTraining = true;
 
-            // Creates the subsets
-            Candidate[][] subsets = new Candidate[numSubsets][];
-            int rolingTotal = 0;
-            for (int i = 0; i < numSubsets; i++)
-            {
-                subsets[i] = new Candidate[subsetSizes[i]];
-                System.Array.Copy(candidates, rolingTotal, subsets[i], 0, subsetSizes[i]);
-                rolingTotal += subsetSizes[i];
-            }
-
-            // Simulates the tournament for each subset
-            for (int i = 0; i < numSubsets; i++)
-            {
-                for (int x = 0; x < subsets[i].Length - 1; x++)
-                {
-                    for (int y = x + 1; y < subsets[i].Length; y++)
-                    {
-                        GameSimulator.SimulateMatch(ref subsets[i][x], ref subsets[i][y]);
-                        taskProgress.simulatedGames++;
-                    }
-                }
-            }
-
-            // Calculates how many candidates should move on to main set
-            int[] fromSubsetsToMainset = new int[numSubsets];
-            int subsetProgressionCount = mainsetSize / numSubsets;
-            for (int i = 0; i < numSubsets - 1; i++)
-            {
-                fromSubsetsToMainset[i] = subsetProgressionCount;
-            }
-            fromSubsetsToMainset[numSubsets - 1] = mainsetSize - subsetProgressionCount * (numSubsets - 1);
-
-            // Sorts each subset
-            for (int i = 0; i < subsets.Length; i++)
-            {
-                Sort(ref subsets[i]);
-            }
-
-            // Creates the main set
-            Candidate[] mainSet = new Candidate[mainsetSize];
-            int currentMainSetIndex = 0;
-            for (int i = 0; i < fromSubsetsToMainset.Length; i++)
-            {
-                for (int j = 0; j < fromSubsetsToMainset[i]; j++)
-                {
-                    mainSet[currentMainSetIndex] = subsets[i][j];
-                    mainSet[currentMainSetIndex].score.Reset();
-                    currentMainSetIndex++;
-                }
-            }
-
             // Simulates games in main set
-            for (int x = 0; x < mainSet.Length - 1; x++)
+            for (int x = 0; x < candidates.Length - 1; x++)
             {
-                for (int y = x + 1; y < mainSet.Length; y++)
+                for (int y = x + 1; y < candidates.Length; y++)
                 {
-                    GameSimulator.SimulateMatch(ref mainSet[x], ref mainSet[y]);
+                    GameSimulator.SimulateMatch(ref candidates[x], ref candidates[y]);
                     taskProgress.simulatedGames++;
                 }
             }
 
             // Sorts main set
-            Sort(ref mainSet);
+            Sort(ref candidates);
 
             // Returns best candidates from the main set
             Candidate[] topCandidates = new Candidate[numRes];
             for (int i = 0; i < numRes; i++)
             {
-                topCandidates[i] = mainSet[i];
+                topCandidates[i] = candidates[i];
             }
 
             // Adds top candidates to the results stack

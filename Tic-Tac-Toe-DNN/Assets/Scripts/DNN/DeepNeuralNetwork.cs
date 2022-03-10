@@ -63,11 +63,11 @@ namespace NN
             // Number of weights
             int nWeights = DeepNeuralNetwork.NumWeights(nInput, nHidden, nOutput)[0];
 
-            // Generates random small number between 0.01 and 0.1
+            // Generates random small number between -0.1 and 0.1
             double[] wts = new double[nWeights];
             for (int i = 0; i < nWeights; i++)
             {
-                wts[i] = (rnd.Next(1, 100) * 0.001);
+                wts[i] = rnd.NextDouble() * 0.2 - 0.1;
             }
 
             SetWeights(wts);
@@ -78,11 +78,11 @@ namespace NN
             // Number of weights
             int nBiases = DeepNeuralNetwork.NumWeights(nInput, nHidden, nOutput)[1];
 
-            // Generates random small number between 0.01 and 0.1
+            // Generates random small number between -0.1 and 0.1
             double[] bts = new double[nBiases];
             for (int i = 0; i < nBiases; i++)
             {
-                bts[i] = (rnd.Next(1, 100) * 0.001);
+                bts[i] = rnd.NextDouble() * 0.2 - 0.1;
             }
 
             SetBiases(bts);
